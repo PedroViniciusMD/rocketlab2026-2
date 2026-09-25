@@ -8,6 +8,9 @@ venv/
 .coverage
 htmlcov/
 
+# Csvs
+backend/data/raw/
+
 # Ambiente e banco local
 .env
 *.db
