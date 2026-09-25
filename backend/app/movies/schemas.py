@@ -4,14 +4,14 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 # Responses
-class GenreResponse(BaseModel):
+class GenreResponse(BaseModel): #
     model_config = ConfigDict(from_attributes=True)
 
     sk_genre_id: str
     nome_genero: str
 
 
-class PersonResponse(BaseModel):
+class PersonResponse(BaseModel): #
     model_config = ConfigDict(from_attributes=True)
 
     sk_person_id: str
@@ -19,7 +19,7 @@ class PersonResponse(BaseModel):
     tipo_pessoa: str
 
 
-class CompanyResponse(BaseModel):
+class CompanyResponse(BaseModel): #
     model_config = ConfigDict(from_attributes=True)
 
     sk_company_id: str
