@@ -76,6 +76,22 @@ def read_csv(filename: str):
         return list(csv.DictReader(file))
 
 
+def clean_title(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    value = value.strip()
+
+    while (
+        len(value) >= 2
+        and value.startswith('"')
+        and value.endswith('"')
+    ):
+        value = value[1:-1].strip()
+
+    return value
+
+
 async def load_dim_movies(session):
     rows = read_csv("dim_movies.csv")
 
@@ -86,7 +102,7 @@ async def load_dim_movies(session):
             {
                 "sk_movie_id": row["sk_movie_id"],
                 "id_filme": row["id_filme"],
-                "titulo": row["titulo"],
+                "titulo": clean_title(row["titulo"]),
                 "data_lancamento": to_date(row["data_lancamento"]),
                 "ano_lancamento": to_int(row["ano_lancamento"]),
                 "duracao_minutos": to_int(row["duracao_minutos"]),
