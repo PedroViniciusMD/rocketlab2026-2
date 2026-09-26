@@ -243,3 +243,18 @@ class MovieUpdate(BaseModel):
     roteiristas: list[str] | None = None
 
     produtoras: list[str] | None = None
+
+
+class ReviewUpdate(BaseModel):
+    nota: float | None = Field(
+        default=None,
+        ge=0,
+        le=10,
+    )
+
+    comentario: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=4000,
+    )
+ 

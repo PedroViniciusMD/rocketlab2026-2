@@ -14,6 +14,7 @@ from app.movies.schemas import (
     ReviewCreate,
     ReviewResponse,
     ReviewSummaryResponse,
+    ReviewUpdate,
 )
 
 
@@ -606,4 +607,68 @@ class MovieService:
         await session.refresh(review)
 
         return ReviewResponse.model_validate(review)
-        
+    
+    
+    @staticmethod
+    async def update_review(
+        session: AsyncSession,
+        movie_id: str,
+        review_id: str,
+        data: ReviewUpdate,
+    ) -> ReviewResponse | None:
+        movie = await MovieRepository.get_by_id(
+            session=session,
+            movie_id=movie_id,
+        )
+
+        if movie is None:
+            return None
+
+        review = await MovieRepository.get_review_by_id(
+            session=session,
+            movie_id=movie_id,
+            review_id=review_id,
+        )
+
+        if review is None:
+            return None
+
+        update_data = data.model_dump(
+            exclude_unset=True,
+        )
+
+        if "nota" in update_data:
+            review.nota = update_data["nota"]
+
+        if "comentario" in update_data:
+            review.comentario = update_data[
+                "comentario"
+            ].strip()
+
+        try:
+            await MovieRepository.update_review(
+                session=session,
+                review=review,
+            )
+
+            count, average = await MovieRepository.get_review_stats(
+                session=session,
+                movie_id=movie_id,
+            )
+
+            await MovieRepository.save_review_summary(
+                session=session,
+                movie_id=movie_id,
+                count=count,
+                average=average,
+            )
+
+            await session.commit()
+
+        except Exception:
+            await session.rollback()
+            raise
+
+        await session.refresh(review)
+
+        return ReviewResponse.model_validate(review)

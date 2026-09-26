@@ -9,6 +9,7 @@ from app.movies.schemas import (
     MovieUpdate,
     ReviewCreate,
     ReviewResponse,
+    ReviewUpdate,
 )
 from app.movies.service import MovieService
 
@@ -156,6 +157,32 @@ async def create_review(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Filme não encontrado.",
+        )
+
+    return review
+
+
+@router.patch(
+    "/{movie_id}/reviews/{review_id}",
+    response_model=ReviewResponse,
+)
+async def update_review(
+    movie_id: str,
+    review_id: str,
+    data: ReviewUpdate,
+    session: AsyncSession = Depends(get_db),
+) -> ReviewResponse:
+    review = await MovieService.update_review(
+        session=session,
+        movie_id=movie_id,
+        review_id=review_id,
+        data=data,
+    )
+
+    if review is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Filme ou avaliação não encontrado.",
         )
 
     return review

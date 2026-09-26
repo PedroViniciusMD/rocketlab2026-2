@@ -306,3 +306,31 @@ class MovieRepository:
 
         return review
     
+    
+    @staticmethod
+    async def get_review_by_id(
+        session: AsyncSession,
+        movie_id: str,
+        review_id: str,
+    ) -> MovieReview | None:
+        query = select(MovieReview).where(
+            MovieReview.sk_movie_review_id == review_id,
+            MovieReview.sk_movie_id == movie_id,
+        )
+
+        result = await session.execute(query)
+
+        return result.scalar_one_or_none()
+     
+    
+    @staticmethod
+    async def update_review(
+        session: AsyncSession,
+        review: MovieReview,
+    ) -> MovieReview:
+        session.add(review)
+
+        await session.flush()
+
+        return review 
+ 
