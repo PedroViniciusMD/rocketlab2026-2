@@ -126,6 +126,20 @@ class MovieRepository:
     
     
     @staticmethod
+    async def get_by_title(
+        session: AsyncSession,
+        title: str,
+    ) -> DimMovie | None:
+        query = select(DimMovie).where(
+            func.lower(DimMovie.titulo) == title.strip().lower()
+        )
+
+        result = await session.execute(query)
+
+        return result.scalars().first()
+    
+    
+    @staticmethod
     async def create_genre(
         session: AsyncSession,
         name: str,

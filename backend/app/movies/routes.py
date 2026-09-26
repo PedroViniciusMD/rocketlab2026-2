@@ -69,7 +69,14 @@ async def create_movie(
     data: MovieCreate,
     session: AsyncSession = Depends(get_db),
 ) -> MovieDetailResponse:
-    return await MovieService.create_movie(
-        session=session,
-        data=data,
-    )
+    try:
+        return await MovieService.create_movie(
+            session=session,
+            data=data,
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error

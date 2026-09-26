@@ -159,6 +159,17 @@ class MovieService:
         session: AsyncSession,
         data: MovieCreate,
     ) -> MovieDetailResponse:
+        
+        existing_movie = await MovieRepository.get_by_title(
+        session=session,
+        title=data.titulo,
+        )
+        
+        if existing_movie is not None:
+            raise ValueError(
+                "Já existe um filme cadastrado com esse título."
+            )
+        
         movie_id = str(uuid4())
 
         movie = DimMovie(
