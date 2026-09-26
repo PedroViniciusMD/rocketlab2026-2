@@ -7,6 +7,8 @@ from app.movies.schemas import (
     MovieDetailResponse,
     MovieListResponse,
     MovieUpdate,
+    ReviewCreate,
+    ReviewResponse,
 )
 from app.movies.service import MovieService
 
@@ -132,3 +134,28 @@ async def delete_movie(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Filme não encontrado.",
         )
+        
+        
+@router.post(
+    "/{movie_id}/reviews",
+    response_model=ReviewResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_review(
+    movie_id: str,
+    data: ReviewCreate,
+    session: AsyncSession = Depends(get_db),
+) -> ReviewResponse:
+    review = await MovieService.create_review(
+        session=session,
+        movie_id=movie_id,
+        data=data,
+    )
+
+    if review is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Filme não encontrado.",
+        )
+
+    return review

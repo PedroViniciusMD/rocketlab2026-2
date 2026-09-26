@@ -2,7 +2,15 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.movies.models import DimCompany, DimGenre, DimMovie, DimPerson, PersonType
+from app.movies.models import (
+    DimCompany,
+    DimGenre,
+    DimMovie,
+    DimPerson,
+    DimReview,
+    MovieReview,
+    PersonType,
+)
 
 
 class MovieRepository:
@@ -218,3 +226,83 @@ class MovieRepository:
     ) -> None:
         await session.delete(movie)
         await session.flush()
+        
+
+    @staticmethod
+    async def get_review_stats(
+        session: AsyncSession,
+        movie_id: str,
+    ) -> tuple[int, float | None]:
+        query = select(
+            func.count(MovieReview.sk_movie_review_id),
+            func.avg(MovieReview.nota),
+        ).where(
+            MovieReview.sk_movie_id == movie_id
+        )
+
+        result = await session.execute(query)
+
+        count, average = result.one()
+
+        return (
+            int(count),
+            float(average) if average is not None else None,
+        )
+        
+    
+    
+    @staticmethod
+    async def get_review_summary(
+        session: AsyncSession,
+        movie_id: str,
+    ) -> DimReview | None:
+        query = select(DimReview).where(
+            DimReview.sk_movie_id == movie_id
+        )
+
+        result = await session.execute(query)
+
+        return result.scalar_one_or_none()
+    
+    
+    @staticmethod
+    async def save_review_summary(
+        session: AsyncSession,
+        movie_id: str,
+        count: int,
+        average: float | None,
+    ) -> DimReview:
+        summary = await MovieRepository.get_review_summary(
+            session=session,
+            movie_id=movie_id,
+        )
+
+        if summary is None:
+            summary = DimReview(
+                sk_movie_id=movie_id,
+                qtd_avaliacoes_usuarios=count,
+                nota_media_usuarios=average,
+            )
+
+            session.add(summary)
+
+        else:
+            summary.qtd_avaliacoes_usuarios = count
+            summary.nota_media_usuarios = average
+
+        await session.flush()
+
+        return summary
+    
+    
+    @staticmethod
+    async def create_review(
+        session: AsyncSession,
+        review: MovieReview,
+    ) -> MovieReview:
+        session.add(review)
+
+        await session.flush()
+
+        return review
+    

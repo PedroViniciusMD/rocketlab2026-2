@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.movies.models import DimMovie, PersonType
+from app.movies.models import DimMovie, MovieReview, PersonType
 from app.movies.repository import MovieRepository
 from app.movies.schemas import (
     MovieCreate,
@@ -11,6 +11,7 @@ from app.movies.schemas import (
     MovieListResponse,
     MovieUpdate,
     PerformanceResponse,
+    ReviewCreate,
     ReviewResponse,
     ReviewSummaryResponse,
 )
@@ -555,3 +556,54 @@ class MovieService:
             raise
 
         return True
+    
+    
+    @staticmethod
+    async def create_review(
+        session: AsyncSession,
+        movie_id: str,
+        data: ReviewCreate,
+    ) -> ReviewResponse | None:
+        movie = await MovieRepository.get_by_id(
+            session=session,
+            movie_id=movie_id,
+        )
+
+        if movie is None:
+            return None
+
+        review = MovieReview(
+            sk_movie_id=movie.sk_movie_id,
+            nome=data.nome.strip(),
+            nota=data.nota,
+            comentario=data.comentario.strip(),
+        )
+
+        try:
+            await MovieRepository.create_review(
+                session=session,
+                review=review,
+            )
+
+            count, average = await MovieRepository.get_review_stats(
+                session=session,
+                movie_id=movie.sk_movie_id,
+            )
+
+            await MovieRepository.save_review_summary(
+                session=session,
+                movie_id=movie.sk_movie_id,
+                count=count,
+                average=average,
+            )
+
+            await session.commit()
+
+        except Exception:
+            await session.rollback()
+            raise
+
+        await session.refresh(review)
+
+        return ReviewResponse.model_validate(review)
+        
