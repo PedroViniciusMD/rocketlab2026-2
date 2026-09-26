@@ -6,6 +6,7 @@ from app.movies.schemas import (
     MovieCreate,
     MovieDetailResponse,
     MovieListResponse,
+    MovieUpdate,
 )
 from app.movies.service import MovieService
 
@@ -80,3 +81,54 @@ async def create_movie(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error),
         ) from error
+        
+
+@router.patch(
+    "/{movie_id}",
+    response_model=MovieDetailResponse,
+)
+async def update_movie(
+    movie_id: str,
+    data: MovieUpdate,
+    session: AsyncSession = Depends(get_db),
+) -> MovieDetailResponse:
+    try:
+        movie = await MovieService.update_movie(
+            session=session,
+            movie_id=movie_id,
+            data=data,
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
+
+    if movie is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Filme não encontrado.",
+        )
+
+    return movie
+
+
+@router.delete(
+    "/{movie_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_movie(
+    movie_id: str,
+    session: AsyncSession = Depends(get_db),
+) -> None:
+    deleted = await MovieService.delete_movie(
+        session=session,
+        movie_id=movie_id,
+    )
+
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Filme não encontrado.",
+        )

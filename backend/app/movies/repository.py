@@ -199,3 +199,22 @@ class MovieRepository:
 
         return movie
     
+    @staticmethod
+    async def update_movie(
+        session: AsyncSession,
+        movie: DimMovie,
+    ) -> DimMovie:
+        session.add(movie)
+
+        await session.flush()
+
+        return movie
+    
+    
+    @staticmethod
+    async def delete_movie(
+        session: AsyncSession,
+        movie: DimMovie,
+    ) -> None:
+        await session.delete(movie)
+        await session.flush()

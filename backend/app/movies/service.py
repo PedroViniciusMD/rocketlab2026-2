@@ -9,6 +9,7 @@ from app.movies.schemas import (
     MovieDetailResponse,
     MovieListItem,
     MovieListResponse,
+    MovieUpdate,
     PerformanceResponse,
     ReviewResponse,
     ReviewSummaryResponse,
@@ -362,3 +363,195 @@ class MovieService:
             normalized.append(clean_name)
 
         return normalized
+    
+    
+    @staticmethod
+    async def update_movie(
+        session: AsyncSession,
+        movie_id: str,
+        data: MovieUpdate,
+    ) -> MovieDetailResponse | None:
+        movie = await MovieRepository.get_by_id(
+            session=session,
+            movie_id=movie_id,
+        )
+
+        if movie is None:
+            return None
+
+        update_data = data.model_dump(
+            exclude_unset=True,
+        )
+
+        if "titulo" in update_data:
+            new_title = update_data["titulo"].strip()
+
+            existing_movie = await MovieRepository.get_by_title(
+                session=session,
+                title=new_title,
+            )
+
+            if (
+                existing_movie is not None
+                and existing_movie.sk_movie_id != movie.sk_movie_id
+            ):
+                raise ValueError(
+                    "Já existe um filme cadastrado com esse título."
+                )
+
+            movie.titulo = new_title
+
+        simple_fields = [
+            "data_lancamento",
+            "ano_lancamento",
+            "duracao_minutos",
+            "status_filme",
+            "sinopse",
+            "url_poster",
+            "url_backdrop",
+        ]
+
+        for field in simple_fields:
+            if field in update_data:
+                setattr(
+                    movie,
+                    field,
+                    update_data[field],
+                )
+
+        if "generos" in update_data:
+            movie.genres = await MovieService._resolve_genres(
+                session=session,
+                names=update_data["generos"] or [],
+            )
+
+        if "produtoras" in update_data:
+            movie.companies = await MovieService._resolve_companies(
+                session=session,
+                names=update_data["produtoras"] or [],
+            )
+
+        people_changed = any(
+            field in update_data
+            for field in (
+                "diretores",
+                "atores",
+                "roteiristas",
+            )
+        )
+
+        if people_changed:
+            current_diretores = [
+                person.nome_pessoa
+                for person in movie.people
+                if person.tipo_pessoa == "Diretor"
+            ]
+
+            current_atores = [
+                person.nome_pessoa
+                for person in movie.people
+                if person.tipo_pessoa == "Ator"
+            ]
+
+            current_roteiristas = [
+                person.nome_pessoa
+                for person in movie.people
+                if person.tipo_pessoa == "Roteirista"
+            ]
+
+            diretores = update_data.get(
+                "diretores",
+                current_diretores,
+            )
+
+            atores = update_data.get(
+                "atores",
+                current_atores,
+            )
+
+            roteiristas = update_data.get(
+                "roteiristas",
+                current_roteiristas,
+            )
+
+            people = []
+
+            people.extend(
+                await MovieService._resolve_people(
+                    session=session,
+                    names=diretores or [],
+                    person_type="Diretor",
+                )
+            )
+
+            people.extend(
+                await MovieService._resolve_people(
+                    session=session,
+                    names=atores or [],
+                    person_type="Ator",
+                )
+            )
+
+            people.extend(
+                await MovieService._resolve_people(
+                    session=session,
+                    names=roteiristas or [],
+                    person_type="Roteirista",
+                )
+            )
+
+            movie.people = people
+
+        try:
+            await MovieRepository.update_movie(
+                session=session,
+                movie=movie,
+            )
+
+            await session.commit()
+
+        except Exception:
+            await session.rollback()
+            raise
+
+        updated_movie = await MovieRepository.get_by_id(
+            session=session,
+            movie_id=movie.sk_movie_id,
+        )
+
+        if updated_movie is None:
+            raise RuntimeError(
+                "O filme foi atualizado, mas não pôde ser recuperado."
+            )
+
+        return MovieService._to_detail_response(
+            updated_movie
+        )
+        
+        
+    @staticmethod
+    async def delete_movie(
+        session: AsyncSession,
+        movie_id: str,
+    ) -> bool:
+        movie = await MovieRepository.get_by_id(
+            session=session,
+            movie_id=movie_id,
+        )
+
+        if movie is None:
+            return False
+
+        try:
+            await MovieRepository.delete_movie(
+                session=session,
+                movie=movie,
+            )
+
+            await session.commit()
+
+        except Exception:
+            await session.rollback()
+            raise
+
+        return True
