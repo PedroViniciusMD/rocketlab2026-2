@@ -77,3 +77,4 @@ class MovieRepository:
         result = await session.execute(query)
 
         return result.scalar_one_or_none()
+    
