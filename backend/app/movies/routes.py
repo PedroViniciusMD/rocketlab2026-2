@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.movies.schemas import (
+    MovieCreate,
     MovieDetailResponse,
     MovieListResponse,
 )
@@ -57,3 +58,18 @@ async def get_movie(
         )
 
     return movie
+
+
+@router.post(
+    "",
+    response_model=MovieDetailResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_movie(
+    data: MovieCreate,
+    session: AsyncSession = Depends(get_db),
+) -> MovieDetailResponse:
+    return await MovieService.create_movie(
+        session=session,
+        data=data,
+    )

@@ -1,8 +1,8 @@
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.movies.models import DimMovie
+from app.movies.models import DimCompany, DimGenre, DimMovie, DimPerson, PersonType
 
 
 class MovieRepository:
@@ -77,4 +77,111 @@ class MovieRepository:
         result = await session.execute(query)
 
         return result.scalar_one_or_none()
+    
+    
+    @staticmethod
+    async def get_genre_by_name(
+        session: AsyncSession,
+        name: str,
+    ) -> DimGenre | None:
+        query = select(DimGenre).where(
+            func.lower(DimGenre.nome_genero) == name.lower()
+        )
+
+        result = await session.execute(query)
+
+        return result.scalar_one_or_none()
+
+
+    @staticmethod
+    async def get_company_by_name(
+        session: AsyncSession,
+        name: str,
+    ) -> DimCompany | None:
+        query = select(DimCompany).where(
+            func.lower(DimCompany.nome_produtora) == name.lower()
+        )
+
+        result = await session.execute(query)
+
+        return result.scalar_one_or_none()
+
+
+    @staticmethod
+    async def get_person_by_name_and_type(
+        session: AsyncSession,
+        name: str,
+        person_type: PersonType,
+    ) -> DimPerson | None:
+        query = select(DimPerson).where(
+            and_(
+                func.lower(DimPerson.nome_pessoa) == name.lower(),
+                DimPerson.tipo_pessoa == person_type,
+            )
+        )
+
+        result = await session.execute(query)
+
+        return result.scalar_one_or_none()
+    
+    
+    @staticmethod
+    async def create_genre(
+        session: AsyncSession,
+        name: str,
+    ) -> DimGenre:
+        genre = DimGenre(
+            nome_genero=name,
+        )
+
+        session.add(genre)
+
+        await session.flush()
+
+        return genre
+
+
+    @staticmethod
+    async def create_company(
+        session: AsyncSession,
+        name: str,
+    ) -> DimCompany:
+        company = DimCompany(
+            nome_produtora=name,
+        )
+
+        session.add(company)
+
+        await session.flush()
+
+        return company
+
+
+    @staticmethod
+    async def create_person(
+        session: AsyncSession,
+        name: str,
+        person_type: PersonType,
+    ) -> DimPerson:
+        person = DimPerson(
+            nome_pessoa=name,
+            tipo_pessoa=person_type,
+        )
+
+        session.add(person)
+
+        await session.flush()
+
+        return person
+    
+    @staticmethod
+    async def create_movie(
+        session: AsyncSession,
+        movie: DimMovie,
+    ) -> DimMovie:
+        session.add(movie)
+
+        await session.flush()
+
+        return movie
     
