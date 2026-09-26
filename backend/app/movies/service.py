@@ -572,7 +572,18 @@ class MovieService:
 
         if movie is None:
             return None
-
+        
+        existing_review = await MovieRepository.get_review_by_name(
+            session=session,
+            movie_id=movie_id,
+            name=data.nome.strip(),
+        )
+        
+        if existing_review is not None:
+            raise ValueError(
+                f"Você {data.nome.strip()} já avaliou esse filme."
+            )
+        
         review = MovieReview(
             sk_movie_id=movie.sk_movie_id,
             nome=data.nome.strip(),

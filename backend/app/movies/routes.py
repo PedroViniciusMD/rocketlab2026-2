@@ -147,11 +147,18 @@ async def create_review(
     data: ReviewCreate,
     session: AsyncSession = Depends(get_db),
 ) -> ReviewResponse:
-    review = await MovieService.create_review(
-        session=session,
-        movie_id=movie_id,
-        data=data,
-    )
+    try:
+        review = await MovieService.create_review(
+            session=session,
+            movie_id=movie_id,
+            data=data,
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
 
     if review is None:
         raise HTTPException(
