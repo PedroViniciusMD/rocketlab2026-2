@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 import { getMovies } from "../../api/movies";
 import { MovieCard } from "../../components/MovieCard/MovieCard";
@@ -52,11 +53,20 @@ export function MoviesPage() {
   return (
     <main className="movies-page">
       <header className="movies-page__header">
-        <h1>RocketFlix</h1>
+        <div>
+          <h1>RocketFlix</h1>
 
-        <p>
-          Encontre seu próximo filme favorito entre {data?.total} opções.
-        </p>
+          <p>
+            Encontre seu próximo filme favorito entre {data?.total} opções.
+          </p>
+        </div>
+
+        <Link
+          to="/movies/new"
+          className="movies-page__create"
+        >
+          Cadastrar filme
+        </Link>
       </header>
 
       <div className="movies-page__search">

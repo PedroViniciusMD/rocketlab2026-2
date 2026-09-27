@@ -1,0 +1,82 @@
+.movie-create-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.movie-create-page__back {
+  display: inline-block;
+  margin-bottom: 24px;
+
+  color: #333;
+  text-decoration: none;
+}
+
+.movie-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  padding: 24px;
+
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.movie-create-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.movie-create-form__field label {
+  font-weight: 600;
+}
+
+.movie-create-form__field input,
+.movie-create-form__field textarea {
+  padding: 10px 12px;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+
+  font: inherit;
+}
+
+.movie-create-form__field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.movie-create-form__row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.movie-create-form button {
+  align-self: flex-start;
+
+  padding: 12px 20px;
+
+  border: none;
+  border-radius: 6px;
+
+  cursor: pointer;
+}
+
+.movie-create-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.movie-create-form__error {
+  color: #b00020;
+}
+
+@media (max-width: 700px) {
+  .movie-create-form__row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -31,3 +31,23 @@
   );
   gap: 24px;
 }
+
+.movies-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-bottom: 24px;
+}
+
+.movies-page__create {
+  padding: 10px 16px;
+
+  border-radius: 6px;
+
+  background-color: #222;
+  color: white;
+
+  text-decoration: none;
+}
