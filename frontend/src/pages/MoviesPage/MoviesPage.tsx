@@ -52,10 +52,10 @@ export function MoviesPage() {
   return (
     <main className="movies-page">
       <header className="movies-page__header">
-        <h1>Catálogo de filmes</h1>
+        <h1>RocketFlix</h1>
 
         <p>
-          {data?.total} filmes encontrados
+          Encontre seu próximo filme favorito entre {data?.total} opções.
         </p>
       </header>
 

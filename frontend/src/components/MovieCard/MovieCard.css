@@ -35,3 +35,8 @@
 .movie-card__rating {
   margin: 6px 0;
 }
+
+.movie-card-link {
+  text-decoration: none;
+  color: inherit;
+}

@@ -1,4 +1,4 @@
-import type { MovieListResponse } from "../types/movie";
+import type { MovieListResponse, MovieDetail, Review, ReviewCreate } from "../types/movie";
 
 const API_URL = "http://localhost:8000/api/v1";
 
@@ -22,6 +22,20 @@ export async function getMovies(
 
   if (!response.ok) {
     throw new Error("Erro ao carregar filmes.");
+  }
+
+  return response.json();
+}
+
+export async function getMovieById(
+  movieId: string
+): Promise<MovieDetail> {
+  const response = await fetch(
+    `${API_URL}/movies/${movieId}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Erro ao carregar o filme.");
   }
 
   return response.json();
