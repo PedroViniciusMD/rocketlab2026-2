@@ -1,4 +1,4 @@
-import type { MovieListResponse, MovieDetail, Review, ReviewCreate } from "../types/movie";
+import type { MovieCreate, MovieListResponse, MovieDetail, Review, ReviewCreate } from "../types/movie";
 
 const API_URL = "http://localhost:8000/api/v1";
 
@@ -36,6 +36,57 @@ export async function getMovieById(
 
   if (!response.ok) {
     throw new Error("Erro ao carregar o filme.");
+  }
+
+  return response.json();
+}
+
+export async function createReview(
+  movieId: string,
+  data: ReviewCreate
+): Promise<Review> {
+  const response = await fetch(
+    `${API_URL}/movies/${movieId}/reviews`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+
+    throw new Error(
+      errorData.detail ?? "Erro ao criar avaliação."
+    );
+  }
+
+  return response.json();
+}
+
+export async function createMovie(
+  data: MovieCreate
+): Promise<MovieDetail> {
+  const response = await fetch(
+    `${API_URL}/movies`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+
+    throw new Error(
+      errorData.detail ?? "Erro ao cadastrar filme."
+    );
   }
 
   return response.json();

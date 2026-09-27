@@ -65,6 +65,22 @@ export interface MovieDetail {
   avaliacoes: Review[];
 }
 
+export interface MovieCreate {
+  titulo: string;
+  data_lancamento: string | null;
+  ano_lancamento: number | null;
+  duracao_minutos: number | null;
+  status_filme: string | null;
+  sinopse: string | null;
+  url_poster: string | null;
+  url_backdrop: string | null;
+  generos: string[];
+  diretores: string[];
+  atores: string[];
+  roteiristas: string[];
+  produtoras: string[];
+}
+
 export interface ReviewCreate {
   nome: string;
   nota: number;

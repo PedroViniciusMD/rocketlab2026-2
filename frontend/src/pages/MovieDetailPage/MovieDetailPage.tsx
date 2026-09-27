@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 
+import { ReviewForm } from "../../components/ReviewForm/ReviewForm";
 import { getMovieById } from "../../api/movies";
 
 import "./MovieDetailPage.css";
@@ -144,6 +145,8 @@ export function MovieDetailPage() {
           </p>
         </div>
       </section>
+      
+      <ReviewForm movieId={movie.sk_movie_id} />
 
       <section className="movie-reviews">
         <h2>Avaliações</h2>
