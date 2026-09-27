@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { MoviesPage } from "./pages/MoviesPage/MoviesPage";
 import { MovieDetailPage } from "./pages/MovieDetailPage/MovieDetailPage";
 import { MovieCreatePage } from "./pages/MovieCreatePage/MovieCreatePage";
+import { MovieEditPage } from "./pages/MovieEditPage/MovieEditPage";
 
 function App() {
   return (
@@ -15,6 +16,11 @@ function App() {
       <Route
         path="/movies/new"
         element={<MovieCreatePage />}
+      />
+
+      <Route
+        path="/movies/:movieId/edit"
+        element={<MovieEditPage />}
       />
 
       <Route

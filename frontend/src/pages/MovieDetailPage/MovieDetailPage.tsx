@@ -29,12 +29,21 @@ export function MovieDetailPage() {
 
   return (
     <main className="movie-detail-page">
+    <div className="movie-detail-page__actions">
       <Link
         to="/"
         className="movie-detail-page__back"
       >
         ← Voltar para o início do catálogo
       </Link>
+
+      <Link
+        to={`/movies/${movie.sk_movie_id}/edit`}
+        className="movie-detail-page__edit"
+      >
+         Editar filme
+      </Link>
+      </div>
 
       <section className="movie-detail">
         {movie.url_poster ? (

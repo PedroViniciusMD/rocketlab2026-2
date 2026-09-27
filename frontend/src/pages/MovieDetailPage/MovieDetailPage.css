@@ -4,11 +4,28 @@
   padding: 24px;
 }
 
-.movie-detail-page__back {
-  display: inline-block;
-  margin-bottom: 24px;
+.movie-detail-page__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 
+  margin-bottom: 24px;
+}
+
+.movie-detail-page__back {
   color: #333;
+  text-decoration: none;
+}
+
+.movie-detail-page__edit {
+  padding: 10px 16px;
+
+  border-radius: 6px;
+
+  background-color: #222;
+  color: white;
+
   text-decoration: none;
 }
 
@@ -64,6 +81,11 @@
 }
 
 @media (max-width: 700px) {
+  .movie-detail-page__actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .movie-detail {
     grid-template-columns: 1fr;
   }

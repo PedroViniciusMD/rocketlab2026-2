@@ -1,4 +1,4 @@
-import type { MovieCreate, MovieListResponse, MovieDetail, Review, ReviewCreate } from "../types/movie";
+import type { MovieCreate, MovieUpdate, MovieListResponse, MovieDetail, Review, ReviewCreate } from "../types/movie";
 
 const API_URL = "http://localhost:8000/api/v1";
 
@@ -86,6 +86,32 @@ export async function createMovie(
 
     throw new Error(
       errorData.detail ?? "Erro ao cadastrar filme."
+    );
+  }
+
+  return response.json();
+}
+
+export async function updateMovie(
+  movieId: string,
+  data: MovieUpdate
+): Promise<MovieDetail> {
+  const response = await fetch(
+    `${API_URL}/movies/${movieId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+
+    throw new Error(
+      errorData.detail ?? "Erro ao atualizar filme."
     );
   }
 

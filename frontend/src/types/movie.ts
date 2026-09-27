@@ -81,6 +81,21 @@ export interface MovieCreate {
   produtoras: string[];
 }
 
+export interface MovieUpdate {
+  titulo?: string;
+  ano_lancamento?: number | null;
+  duracao_minutos?: number | null;
+  status_filme?: string | null;
+  sinopse?: string | null;
+  url_poster?: string | null;
+  url_backdrop?: string | null;
+  generos?: string[];
+  diretores?: string[];
+  atores?: string[];
+  roteiristas?: string[];
+  produtoras?: string[];
+}
+
 export interface ReviewCreate {
   nome: string;
   nota: number;
