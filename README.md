@@ -281,7 +281,8 @@ O catálogo inicial utiliza `GET /api/v1/movies`. O TanStack Query realiza a cha
  
 
 ## Decisões de implementação
- 
+
+- utilização de timeout nas requisições HTTP para evitar que o usuário fique aguardando indefinidamente em caso de falha ou lentidão da API;
 - uso de `sk_movie_id` para identificar os filmes nas rotas individuais;
 - títulos duplicados não podem ser cadastrados novamente pela aplicação;
 - a comparação de títulos para novos cadastros desconsidera diferenças entre maiúsculas e minúsculas;
