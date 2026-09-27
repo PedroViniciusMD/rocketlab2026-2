@@ -1,4 +1,5 @@
 import type { MovieCreate, MovieUpdate, MovieListResponse, MovieDetail, Review, ReviewCreate } from "../types/movie";
+import { fetchWithTimeout } from "./client";
 
 const API_URL = "http://localhost:8000/api/v1";
 
@@ -16,7 +17,7 @@ export async function getMovies(
     params.set("search", search);
   }
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/movies?${params.toString()}`
   );
 
@@ -30,7 +31,7 @@ export async function getMovies(
 export async function getMovieById(
   movieId: string
 ): Promise<MovieDetail> {
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/movies/${movieId}`
   );
 
@@ -45,7 +46,7 @@ export async function createReview(
   movieId: string,
   data: ReviewCreate
 ): Promise<Review> {
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/movies/${movieId}/reviews`,
     {
       method: "POST",
@@ -70,7 +71,7 @@ export async function createReview(
 export async function createMovie(
   data: MovieCreate
 ): Promise<MovieDetail> {
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/movies`,
     {
       method: "POST",
@@ -96,7 +97,7 @@ export async function updateMovie(
   movieId: string,
   data: MovieUpdate
 ): Promise<MovieDetail> {
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/movies/${movieId}`,
     {
       method: "PATCH",
@@ -121,7 +122,7 @@ export async function updateMovie(
 export async function deleteMovie(
   movieId: string
 ): Promise<void> {
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${API_URL}/movies/${movieId}`,
     {
       method: "DELETE",
