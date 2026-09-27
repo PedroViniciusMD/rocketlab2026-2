@@ -1,13 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useParams, useNavigate } from "react-router-dom";
 
 import { ReviewForm } from "../../components/ReviewForm/ReviewForm";
-import { getMovieById } from "../../api/movies";
+import { getMovieById, deleteMovie } from "../../api/movies";
 
 import "./MovieDetailPage.css";
 
 export function MovieDetailPage() {
   const { movieId } = useParams();
+
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const {
     data: movie,
@@ -18,6 +21,38 @@ export function MovieDetailPage() {
     queryFn: () => getMovieById(movieId!),
     enabled: !!movieId,
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteMovie(movieId!),
+
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: ["movie", movieId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["movies"],
+      });
+
+      navigate("/");
+    },
+  });
+
+  function handleDelete() {
+    if (!movie) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Tem certeza que deseja excluir "${movie.titulo}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    deleteMutation.mutate();
+  }
 
   if (isLoading) {
     return <p>Carregando filme...</p>;
@@ -37,13 +72,33 @@ export function MovieDetailPage() {
         ← Voltar para o início do catálogo
       </Link>
 
-      <Link
-        to={`/movies/${movie.sk_movie_id}/edit`}
-        className="movie-detail-page__edit"
-      >
-         Editar filme
-      </Link>
+      <div className="movie-detail-page__management">
+            <Link
+            to={`/movies/${movie.sk_movie_id}/edit`}
+            className="movie-detail-page__edit"
+            >
+            Editar filme
+            </Link>
+
+            <button
+            type="button"
+            className="movie-detail-page__delete"
+            onClick={handleDelete}
+            disabled={deleteMutation.isPending}
+            >
+            {deleteMutation.isPending
+                ? "Excluindo..."
+                : "Excluir filme"}
+            </button>
+        </div>
       </div>
+      
+      {deleteMutation.isError && (
+        <p className="movie-detail-page__delete-error">
+            {deleteMutation.error.message}
+        </p>
+      )}
+    
 
       <section className="movie-detail">
         {movie.url_poster ? (

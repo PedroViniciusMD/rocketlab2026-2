@@ -117,3 +117,30 @@ export async function updateMovie(
 
   return response.json();
 }
+
+export async function deleteMovie(
+  movieId: string
+): Promise<void> {
+  const response = await fetch(
+    `${API_URL}/movies/${movieId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    let message = "Erro ao excluir filme.";
+
+    try {
+      const errorData = await response.json();
+
+      if (errorData.detail) {
+        message = errorData.detail;
+      }
+    } catch {
+      // dando catch no response sem JSON
+    }
+
+    throw new Error(message);
+  }
+}
