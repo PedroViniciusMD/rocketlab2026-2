@@ -9,7 +9,8 @@ venv/
 htmlcov/
 
 # Csvs
-backend/data/raw/
+backend/data/raw/*
+!backend/data/raw/.gitkeep
 
 # Ambiente e banco local
 .env
